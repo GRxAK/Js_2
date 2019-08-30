@@ -1,0 +1,90 @@
+@ColorOne: #2D2C28;
+@ColorTwo: #ffae00;
+@ColorThree: #FFF6E5;
+@ColorFour: #FFFCF7;
+
+@import url('https://fonts.googleapis.com/css?family=Neucha&display=swap&subset=cyrillic');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Neucha', cursive;
+}
+
+body {
+    background: @ColorFour;
+}
+
+p {
+    font-size: 16px;
+}
+
+.conteyner {
+    width: 1020px;
+    margin: 30px auto;
+    border: 1px solid @ColorOne;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+// button
+
+button {
+    border: none;
+    font-size: 18px;
+    border-radius: 3px;
+    padding: 5px;
+    color: @ColorThree;
+    background: @ColorTwo;
+    text-shadow: 0 0 5px @ColorOne;
+    cursor: pointer;
+    transition: 0.6s;
+}
+
+button:hover {
+    background: @ColorTwo + #222;
+    box-shadow: 0 0 5px @ColorTwo + #222;
+    color: @ColorThree + #222;
+}
+
+// header
+
+header {
+    background: @ColorOne;
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+// main
+
+main {
+    background: @ColorThree;
+}
+
+.goods {
+    &-list {
+        display: flex;
+        padding: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    &-item {
+        width: 290px;
+        margin: 15px;
+        display: grid;
+        justify-content: center;
+        grid-gap: 15px;
+        border: 1px solid @ColorOne;
+        border-radius: 3px;
+        padding: 15px 0;
+        & img {
+            width: 250px;
+            height: 175px;
+            background: @ColorFour;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+    }
+    
+}
