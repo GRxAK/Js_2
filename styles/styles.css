@@ -38,7 +38,7 @@ header {
   background: #2d2c28;
   padding: 15px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 main {
   background: #fff6e5;
