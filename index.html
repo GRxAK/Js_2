@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,21 +8,38 @@
     <link rel="stylesheet" href="styles/styles.css">
     <title>eShop</title>
 </head>
+
 <body>
-    <div class="conteyner">
-        <header>
-            <div class="search">
-                <form class="goods-search-from">
-                    <input type="text" class="goods-search" />
-                    <button class="search-button">Искать</button>
-                </form>
-            </div>
-            <button class="cart-button" type="button">Корзина</button>
-        </header>
-        <main>
-            <div class="goods-list"></div>
-        </main>
+    <div id="app">
+        <div class="conteyner">
+            <header>
+                <div class="search">
+                    <form class="goods-search-from">
+                        <input type="text" class="goods-search" v-model="searchLine" />
+                        <button class="search-button" @click.prevent="filterGoods(searchLine)">Искать</button>
+                    </form>
+                </div>
+                <button class="cart-button" type="button" @click.prevent="isVisibleCart=!isVisibleCart">Корзина</button>
+            </header>
+            <main class="content">
+                <div class="isCart" v-if="isVisibleCart">
+                    <div class="isCart-header">
+                        <h3>Name</h3>
+                        <h3>Price</h3>
+                    </div>
+                </div>
+                <div class="goods-list">
+                    <div class="goods-item" v-for="good in filteredGoods">
+                        <h3>{{ good.product_name }}</h3>
+                        <p>{{ good.price }}</p>
+                        <button>Добавить в корзину</button>
+                    </div>
+                    <h3 v-if="goods.length == 0">Нет данных</h3>
+                </div>
+        </div>
     </div>
 </body>
-<script src="js/script2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="js/script.js"></script>
+
 </html>
