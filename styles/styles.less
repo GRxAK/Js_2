@@ -60,6 +60,24 @@ header {
 
 main {
     background: @ColorThree;
+    position: relative;
+}
+
+.isCart {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: @ColorFour;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border: 1px solid @ColorOne;
+    padding: 20px;
+    &-header {
+        display: grid;
+        grid-gap: 20px;
+        grid-template-columns: 1fr 1fr;
+        justify-content: space-between;
+    }
 }
 
 .goods {
@@ -85,6 +103,9 @@ main {
             border-radius: 3px;
             overflow: hidden;
         }
+    }
+    &-search {
+        border-radius: 2px;
     }
     
 }

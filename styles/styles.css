@@ -42,6 +42,23 @@ header {
 }
 main {
   background: #fff6e5;
+  position: relative;
+}
+.isCart {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #fffcf7;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border: 1px solid #2d2c28;
+  padding: 20px;
+}
+.isCart-header {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
 }
 .goods-list {
   display: flex;
@@ -65,4 +82,7 @@ main {
   background: #fffcf7;
   border-radius: 3px;
   overflow: hidden;
+}
+.goods-search {
+  border-radius: 2px;
 }
