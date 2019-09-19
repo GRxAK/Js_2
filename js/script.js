@@ -1,20 +1,100 @@
 const BASE_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+
+Vue.component('goods-item', {
+  props: ['good'],
+  methods: {
+    add() {
+      this.$emit('add', this.good.id_product);
+    }
+  },
+  template: `
+    <div class="goods-item">
+        <h3>{{ good.product_name }}</h3>
+        <p>{{ good.price }}</p>
+        <button @click="add">Добавить в корзину</button>
+    </div>
+  `
+});
+
+Vue.component('goods-list', {
+  props: ['goods'],
+  computed: {
+    isGoodsNotEmpty() {
+      return this.goods.length > 0;
+    }
+  },
+  methods: {
+    addTo(productId) {
+      this.$emit('add', productId)
+    }
+  },
+  template: `
+    <div class="goods-list" v-if="isGoodsNotEmpty">
+      <goods-item v-for="good in goods" @add="addTo"
+          :good="good" :key="good.id_product"></goods-item>
+    </div>
+    <div class="goods-empty" v-else>
+       Нет данных
+    </div>
+  `
+});
+
+Vue.component('cart-button', {
+  data() {
+    return { isVisibleCart: false }
+  },
+  methods: {
+    toggleCartVisibility() {
+      this.isVisibleCart = !this.isVisibleCart;
+    },
+  },
+  template: `
+  <div>
+    <button class="cart-button" @click="toggleCartVisibility">Корзина</button>
+    <transition name="fade">
+      <div class="cart-container" v-if="isVisibleCart"></div>
+    </transition>
+  </div>
+  `
+});
+
+Vue.component('search', {
+  props: ['value'],
+  template: `
+    <div class="search">
+      <form class="goods-search-from" @submit.prevent>
+        <input type="text" class="goods-search" v-bind:value="value"
+        v-on:input="$emit('input', $event.target.value)"/>
+      </form>
+    </div>
+  `
+});
+
 const app = new Vue({
   el: '#app',
   data: {
     goods: [],
-    filteredGoods: [],
     searchLine: '',
-    isVisibleCart: '',
-    visibleGood: ''
+    error: false
+  },
+  computed: {
+    filteredGoods() {
+      const regexp = new RegExp(this.searchLine, 'i');
+      return this.goods.filter((good) => {
+        return regexp.test(good.product_name);
+      });
+    },
   },
   mounted() {
     this.makeGETRequest(`${BASE_URL}/catalogData.json`).then((goods) => {
       this.goods = goods;
-      this.filteredGoods = goods;
+      console.log(goods);
     }).catch(err => console.error(err));
   },
   methods: {
+    addToCart(productId) {
+      console.log('add product', productId);
+    },
     makeGETRequest(url) {
       return new Promise((resolve, reject) => {
         const xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject('Microsoft.XMLHTTP');
@@ -33,12 +113,6 @@ const app = new Vue({
 
         xhr.open('GET', url);
         xhr.send();
-      });
-    },
-    filterGoods(value) {
-      const regexp = new RegExp(value, 'i');
-      this.filteredGoods = this.goods.filter((good) => {
-      return regexp.test(good.product_name);
       });
     }
   }
