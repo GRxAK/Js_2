@@ -1,10 +1,92 @@
-const BASE_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+//import { stat } from "fs";
+
+const BASE_URL = '';
+
+Vue.component('notification', {
+  props: ['error', 'level'],
+  computed: {
+    errorModel() {
+      return this.error.message ? this.error.message : this.error;
+    },
+    top() {
+      return `${(this.level + 1) * 20}px`;
+    }
+  },
+  template: `
+    <div class="notification notification--error" :style="{top: top}">
+       {{ errorModel }}
+    </div>
+  `
+})
+
+Vue.component('search', {
+  props: ['value'],
+  computed: {
+    searchModel: {
+      get() {
+        return this.value;
+      },
+      set(newValue) {
+        this.$emit('input', newValue)
+      }
+    }
+  },
+  template: `
+    <div class="search">
+      <form class="goods-search-from" @submit.prevent>
+        <input type="text" class="goods-search" v-model.trim="searchModel" />
+      </form>
+    </div>
+  `
+});
+
+Vue.component('cart-item', {
+  props: ['good'],
+  methods: {
+    remove() {
+      this.$emit('remove', this.good);
+    }
+  },
+  template: `
+    <div class="cart-item">
+      <p>{{ good.product_name }}</p>
+      <p>{{ good.price }}</p>
+      <button class="cart-button" @click="remove">Убрать</button>
+    </div>
+  `
+});
+
+Vue.component('cart', {
+  props: ['goods'],
+  data: () => ({
+    isVisibleCart: false,
+  }),
+  methods: {
+    toggleCartVisibility() {
+      this.isVisibleCart = !this.isVisibleCart;
+    },
+    removeTo(productId) {
+      this.$emit('remove', productId)
+    }
+  },
+  template: `
+    <div class="cart">
+      <button class="cart-button" @click="toggleCartVisibility">Корзина</button>
+      <transition name="fade">
+        <div class="cart-container" v-if="isVisibleCart">
+        <cart-item v-for="good in goods" @remove="removeTo"
+        :good="good" :key="good.id_product"></cart-item>
+        </div>
+      </transition>
+    </div>
+  `
+});
 
 Vue.component('goods-item', {
   props: ['good'],
   methods: {
     add() {
-      this.$emit('add', this.good.id_product);
+      this.$emit('add', this.good);
     }
   },
   template: `
@@ -39,43 +121,13 @@ Vue.component('goods-list', {
   `
 });
 
-Vue.component('cart-button', {
-  data() {
-    return { isVisibleCart: false }
-  },
-  methods: {
-    toggleCartVisibility() {
-      this.isVisibleCart = !this.isVisibleCart;
-    },
-  },
-  template: `
-  <div>
-    <button class="cart-button" @click="toggleCartVisibility">Корзина</button>
-    <transition name="fade">
-      <div class="cart-container" v-if="isVisibleCart"></div>
-    </transition>
-  </div>
-  `
-});
-
-Vue.component('search', {
-  props: ['value'],
-  template: `
-    <div class="search">
-      <form class="goods-search-from" @submit.prevent>
-        <input type="text" class="goods-search" v-bind:value="value"
-        v-on:input="$emit('input', $event.target.value)"/>
-      </form>
-    </div>
-  `
-});
-
 const app = new Vue({
   el: '#app',
   data: {
     goods: [],
     searchLine: '',
-    error: false
+    goodsInCart: [],
+    errors: [],
   },
   computed: {
     filteredGoods() {
@@ -83,19 +135,56 @@ const app = new Vue({
       return this.goods.filter((good) => {
         return regexp.test(good.product_name);
       });
-    },
+    }
   },
   mounted() {
-    this.makeGETRequest(`${BASE_URL}/catalogData.json`).then((goods) => {
+    this.makeGETRequest(`${BASE_URL}/catalogData`).then((goods) => {
       this.goods = goods;
-      console.log(goods);
-    }).catch(err => console.error(err));
+    }).catch(err => this.addError(err));
+    this.cartGoods();
   },
   methods: {
-    addToCart(productId) {
-      console.log('add product', productId);
+    cartGoods() {
+      this.makeGETRequest(`/catalogCart`).then((goods) => {
+        this.goodsInCart = goods;
+      }).catch(err => this.addError(err));
     },
-    makeGETRequest(url) {
+    addToCart(product) {
+      this.makePOSTRequest('/addToCart', product);
+      this.addStatsCard('add', product);
+      this.cartGoods();
+    },
+    removeToCart(product) {
+      this.makePOSTRequest('/removeToCart', product);
+      this.addStatsCard('remove', product);
+      this.cartGoods();
+    },
+    addStatsCard(act, products) {
+      let stats = {};
+      if (act == 'add') {
+        stats = {
+          action: 'add',
+          product: products,
+          time: new Date()
+        };
+      } else if (act == 'remove') {
+        stats = {
+          action: 'remove',
+          product: products,
+          time: new Date()
+        };
+      }
+      console.log(stats);
+      this.makePOSTRequest('/addStatsCart', stats);
+    },
+    addError(error) {
+      this.errors.push(error);
+      setTimeout(() => {
+        const index = this.errors.indexOf(error);
+        if (index > -1) this.errors.splice(index, 1);
+      }, 3000);
+    },
+    makePOSTRequest(url, data) {
       return new Promise((resolve, reject) => {
         const xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject('Microsoft.XMLHTTP');
 
@@ -104,6 +193,32 @@ const app = new Vue({
             const response = JSON.parse(xhr.responseText);
             if (xhr.status !== 200) reject(response);
             resolve(response);
+          }
+        };
+
+        xhr.onerror = function (e) {
+          reject(e);
+        };
+
+        xhr.open('POST', url);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
+
+        xhr.send(JSON.stringify(data));
+      });
+    },
+    makeGETRequest(url) {
+      return new Promise((resolve, reject) => {
+        const xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject('Microsoft.XMLHTTP');
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              if (xhr.status !== 200) reject(response);
+              resolve(response);
+            } catch (e) {
+              reject(e);
+            }
           }
         };
 
