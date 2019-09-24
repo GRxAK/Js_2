@@ -12,9 +12,10 @@
 <body>
     <div id="app">
         <div class="conteyner">
+            <notification :error="error" :level="level" v-for="(error, level) in errors" :key="`error-${level}`"></notification>
             <header>
                 <search v-model="searchLine"></search>
-                <cart-button></cart-button>
+                <cart :goods="goodsInCart" @remove="removeToCart"></cart>
             </header>
             <main class="content">
                 <goods-list :goods="filteredGoods" @add="addToCart"></goods-list>
