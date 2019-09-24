@@ -51,6 +51,7 @@ button:hover {
 
 header {
     background: @ColorOne;
+    position: relative;
     padding: 15px;
     display: flex;
     justify-content: space-between;
@@ -63,9 +64,12 @@ main {
     position: relative;
 }
 
-.isCart {
+.cart-container {
     position: absolute;
-    top: 0;
+    top: 61px;
+    z-index: 1;
+    width: 300px;
+    height: 200px;
     right: 0;
     background: @ColorFour;
     border-bottom-left-radius: 3px;
