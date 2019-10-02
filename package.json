@@ -1,0 +1,21 @@
+{
+  "name": "js_2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "module.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jasmine": "^3.5.0",
+    "vue": "^2.6.10",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jasmine",
+    "start": "node server.js",
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC"
+}
